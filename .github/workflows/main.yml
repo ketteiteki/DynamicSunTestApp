@@ -18,8 +18,8 @@ jobs:
       - name: Build and push
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:push web -a ${{ secrets.HEROKU_APP_NAME }} --arg FRONT_API_URL=https://dynamicsuntestapp-d11543f8a021.herokuapp.com/
+        run: heroku container:push web --recursive -a ${{ secrets.HEROKU_APP_NAME }} --arg FRONT_API_URL=https://dynamicsuntestapp-d11543f8a021.herokuapp.com/
       - name: Release
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release web --recursive -a ${{ secrets.HEROKU_APP_NAME }}
+        run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
