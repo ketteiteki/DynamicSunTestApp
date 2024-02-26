@@ -85,7 +85,7 @@ export class ArchiveRecordsComponent implements OnInit, OnDestroy {
 
   public async onClickRightAnglePaginatorHandler() {
     if (!this.activeArchiveId) return;
-    if (this.currentPage === this.maxPage) return;
+    if (this.currentPage >= this.maxPage) return;
 
     this.currentPage++;
 

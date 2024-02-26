@@ -4,6 +4,7 @@ import {IWeatherArchiveDto} from "../../types/interfaces/IWeatherArchiveDto";
 import {IWeatherArchiveRecordEntity} from "../../types/interfaces/IWeatherArchiveRecordEntity";
 import {IResult} from "../../types/interfaces/IResult";
 import {UploadWeatherArchiveRequest} from "../../types/requests/UploadWeatherArchiveRequest";
+import {ConfigService} from "../common/config.service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +13,10 @@ export class WeatherArchiveApiService {
   private readonly baseUrl: string = "https://localhost:7242/";
 
   constructor(
-    private _httpClient: HttpClient
+    private _httpClient: HttpClient,
+    private _configService: ConfigService
   ) {
+    this.baseUrl = _configService.getServerUrl();
   }
 
   // GET /WeatherArchive
