@@ -1,3 +1,4 @@
+using DynamicSunTestApp.Application.Models;
 using DynamicSunTestApp.Application.Services.Interfaces;
 using DynamicSunTestApp.Domain.Entities;
 using DynamicSunTestApp.Domain.Responses;
@@ -11,14 +12,15 @@ public class WeatherArchiveService(
     DatabaseContext context,
     IExcelParserService excelParserService)
 {
-    public async Task<Result<List<WeatherArchiveEntity>>> GetWeatherArchiveListAsync(int offset, int limit)
+    public async Task<Result<List<WeatherArchiveDto>>> GetWeatherArchiveListAsync(int offset, int limit)
     {
         var records = await context.WeatherArchiveEntities
             .Skip(offset)
             .Take(limit)
+            .Select(x => new WeatherArchiveDto(x.Id, x.Name, x.WeatherArchiveRecordEntities.Count))
             .ToListAsync();
 
-        return new Result<List<WeatherArchiveEntity>>(records);
+        return new Result<List<WeatherArchiveDto>>(records);
     }
     
     public async Task<Result<List<WeatherArchiveRecordEntity>>> GetWeatherArchiveRecordListAsync(Guid weatherArchiveId, int offset, int limit)
@@ -34,9 +36,9 @@ public class WeatherArchiveService(
         return new Result<List<WeatherArchiveRecordEntity>>(records);
     }
     
-    public async Task<Result<List<WeatherArchiveEntity>>> UploadWeatherArchiveAsync(IFormFile[] files)
+    public async Task<Result<List<WeatherArchiveDto>>> UploadWeatherArchiveAsync(IFormFile[] files)
     {
-        var weatherArchiveEntityList = new List<WeatherArchiveEntity>();
+        var weatherArchiveDtoList = new List<WeatherArchiveDto>();
         
         try
         {
@@ -48,16 +50,22 @@ public class WeatherArchiveService(
                 
                 context.WeatherArchiveEntities.Add(weatherArchiveEntity);
                 context.WeatherArchiveRecordEntities.AddRange(weatherArchiveRecordList);
-                await context.SaveChangesAsync();
 
-                weatherArchiveEntityList.Add(weatherArchiveEntity);
+                var weatherArchiveDto = new WeatherArchiveDto(
+                    weatherArchiveEntity.Id, 
+                    weatherArchiveEntity.Name,
+                    weatherArchiveRecordList.Count);
+                
+                weatherArchiveDtoList.Add(weatherArchiveDto);
             }
         }
         catch (Exception)
         {
-            return new Result<List<WeatherArchiveEntity>>(new Error("The files are invalid"));
+            return new Result<List<WeatherArchiveDto>>(new Error("The files are invalid"));
         }
 
-        return new Result<List<WeatherArchiveEntity>>(weatherArchiveEntityList);
+        await context.SaveChangesAsync();
+        
+        return new Result<List<WeatherArchiveDto>>(weatherArchiveDtoList);
     }
 }

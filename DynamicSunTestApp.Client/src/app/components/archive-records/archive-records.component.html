@@ -1,0 +1,88 @@
+
+<div class="header" *ngIf="(currentWeatherArchive$ | async) as currentWeatherArchive">
+  <h1>{{currentWeatherArchive.name}}</h1>
+  <div class="paginator">
+    <div class="svgAngleContainer" (click)="onClickLeftAnglePaginatorHandler()">
+      <svg-icon src="../../../assets/svg/left-angle.svg" class="leftAngleSvg"></svg-icon>
+    </div>
+    <p>{{currentPage}}/{{maxPage}}</p>
+    <div class="svgAngleContainer" (click)="onClickRightAnglePaginatorHandler()">
+      <svg-icon src="../../../assets/svg/right-angle.svg" class="rightAngleSvg"></svg-icon>
+    </div>
+  </div>
+</div>
+
+<div class="archiveRecordItemList" *ngIf="(weatherArchiveRecords$ | async) as weatherArchiveRecords">
+
+  @for (weatherArchiveRecordItem of weatherArchiveRecords; track weatherArchiveRecordItem; let i = $index) {
+    @if (i === 0) {
+      <div class="month">
+        <p>{{getNameTimeOfYear(weatherArchiveRecordItem.date)}}</p>
+      </div>
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Время</th>
+          <th>T</th>
+          <th>Отн. влажность</th>
+          <th>Td</th>
+          <th>Атм. давление</th>
+          <th>Направление ветра</th>
+          <th>Скорость ветра</th>
+          <th>Облачность</th>
+          <th>h</th>
+          <th>VV</th>
+          <th>Погодные явления</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (secondWeatherArchiveRecordItem of weatherArchiveRecords.slice(0, findLastIndexOfWeatherArchiveRecordByDate(weatherArchiveRecords, weatherArchiveRecordItem.date) + 1);track secondWeatherArchiveRecordItem) {
+            <tr>
+              <td>{{secondWeatherArchiveRecordItem.date}}</td>
+              <td>{{secondWeatherArchiveRecordItem.time}}</td>
+              <td>{{secondWeatherArchiveRecordItem.temperature}}</td>
+              <td>{{secondWeatherArchiveRecordItem.humidity}}</td>
+              <td>{{secondWeatherArchiveRecordItem.dewPoint}}</td>
+              <td>{{secondWeatherArchiveRecordItem.atmosphericPressure}}</td>
+              <td>{{secondWeatherArchiveRecordItem.windDirection}}</td>
+              <td>{{secondWeatherArchiveRecordItem.windSpeed}}</td>
+              <td>{{secondWeatherArchiveRecordItem.cloudiness}}</td>
+              <td>{{secondWeatherArchiveRecordItem.lowerBoundaryOfCloudiness}}</td>
+              <td>{{secondWeatherArchiveRecordItem.horizontalVisibility}}</td>
+              <td>{{secondWeatherArchiveRecordItem.weatherEvents}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (i > 0 && weatherArchiveRecordItem.date !== weatherArchiveRecords[i - 1].date) {
+      @if (isThereDifferenceInMonths(weatherArchiveRecordItem.date, weatherArchiveRecords[i - 1].date)) {
+        <div class="month">
+          <p>{{getNameTimeOfYear(weatherArchiveRecordItem.date)}}</p>
+        </div>
+      }
+      <table class="table">
+        <tbody>
+          @for (secondWeatherArchiveRecordItem of weatherArchiveRecords.slice(i, findLastIndexOfWeatherArchiveRecordByDate(weatherArchiveRecords, weatherArchiveRecordItem.date) + 1);track secondWeatherArchiveRecordItem) {
+            <tr>
+              <td>{{secondWeatherArchiveRecordItem.date}}</td>
+              <td>{{secondWeatherArchiveRecordItem.time}}</td>
+              <td>{{secondWeatherArchiveRecordItem.temperature}}</td>
+              <td>{{secondWeatherArchiveRecordItem.humidity}}</td>
+              <td>{{secondWeatherArchiveRecordItem.dewPoint}}</td>
+              <td>{{secondWeatherArchiveRecordItem.atmosphericPressure}}</td>
+              <td>{{secondWeatherArchiveRecordItem.windDirection}}</td>
+              <td>{{secondWeatherArchiveRecordItem.windSpeed}}</td>
+              <td>{{secondWeatherArchiveRecordItem.cloudiness}}</td>
+              <td>{{secondWeatherArchiveRecordItem.lowerBoundaryOfCloudiness}}</td>
+              <td>{{secondWeatherArchiveRecordItem.horizontalVisibility}}</td>
+              <td>{{secondWeatherArchiveRecordItem.weatherEvents}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>

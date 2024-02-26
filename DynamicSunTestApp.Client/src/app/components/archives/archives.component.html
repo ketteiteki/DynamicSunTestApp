@@ -1,0 +1,12 @@
+
+
+<div class="archiveItemList" *ngIf="(weatherArchives$ | async) as weatherArchives">
+  @for (weatherArchiveItem of weatherArchives; track weatherArchiveItem) {
+    <a routerLink="/archives/{{weatherArchiveItem.id}}" class="archiveItem" (click)="weatherArchiveRecordsState.setWeatherArchive(weatherArchiveItem)">
+      <div class="svgContainer">
+        <svg-icon src="../../../assets/svg/excel.svg" class="excelSvg"></svg-icon>
+      </div>
+      <p>{{weatherArchiveItem.name}}</p>
+    </a>
+  }
+</div>

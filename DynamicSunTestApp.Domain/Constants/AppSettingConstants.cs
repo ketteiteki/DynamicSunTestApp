@@ -4,5 +4,5 @@ public static class AppSettingConstants
 {
     public const string DatabaseConnectionString = "DatabaseConnectionString";
     
-    public const string DatabaseConnectionStringForIntegrationTests = "DatabaseConnectionStringForIntegrationTests";
+    public const string AllowedOrigins = "AllowedOrigins";
 }
