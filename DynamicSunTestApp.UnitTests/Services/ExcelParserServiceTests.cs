@@ -1,8 +1,8 @@
 using DynamicSunTestApp.Application.Services;
+using DynamicSunTestApp.Domain.Constants;
 using DynamicSunTestApp.Domain.Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using Xunit;
@@ -59,7 +59,7 @@ public class ExcelParserServiceTests
         var formFile = new FormFile(memoryStream,  0, memoryStream.Length, name, $"{name}.xlsx")
         {
             Headers = new HeaderDictionary(),
-            ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ContentType = ContentTypeConstants.Xlsx
         };
 
         var excelParserService = new ExcelParserService();

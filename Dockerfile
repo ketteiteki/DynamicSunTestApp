@@ -1,0 +1,35 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+ENV ASPNETCORE_ENVIRONMENT Docker
+EXPOSE 80
+
+FROM node:20.10.0-alpine AS angularBuild
+WORKDIR /angular
+COPY ["DynamicSunTestApp.Client/package.json", "DynamicSunTestApp.Client/"]
+COPY ["DynamicSunTestApp.Client/package-lock.json", "DynamicSunTestApp.Client/"]
+WORKDIR "DynamicSunTestApp.Client"
+RUN npm ci
+WORKDIR /angular
+COPY ["DynamicSunTestApp.Client", "DynamicSunTestApp.Client/"]
+RUN npm install -g @angular/cli@17.1.3
+WORKDIR "DynamicSunTestApp.Client"
+ARG FRONT_API_URL
+RUN sed -i "s|https://localhost:7242/|$FRONT_API_URL|" ./src/assets/config/config.json
+RUN ng build --output-path "dist/client"
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS publish
+WORKDIR /src
+COPY ["DynamicSunTestApp.Application/DynamicSunTestApp.Application.csproj", "DynamicSunTestApp.Application/"]
+COPY ["DynamicSunTestApp.Domain/DynamicSunTestApp.Domain.csproj", "DynamicSunTestApp.Domain/"]
+COPY ["DynamicSunTestApp.Persistence/DynamicSunTestApp.Persistence.csproj", "DynamicSunTestApp.Persistence/"]
+COPY ["DynamicSunTestApp.WebApi/DynamicSunTestApp.WebApi.csproj", "DynamicSunTestApp.WebApi/"]
+RUN dotnet restore "DynamicSunTestApp.WebApi/DynamicSunTestApp.WebApi.csproj"
+COPY . .
+WORKDIR "DynamicSunTestApp.WebApi"
+RUN dotnet publish "DynamicSunTestApp.WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false --no-cache
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+COPY --from=angularBuild "/angular/DynamicSunTestApp.Client/dist/client" wwwroot
+ENTRYPOINT ["dotnet", "DynamicSunTestApp.WebApi.dll"]

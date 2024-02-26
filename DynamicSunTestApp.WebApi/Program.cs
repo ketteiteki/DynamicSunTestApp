@@ -3,6 +3,7 @@ using DynamicSunTestApp.Application.Services;
 using DynamicSunTestApp.Application.Services.Interfaces;
 using DynamicSunTestApp.Domain.Constants;
 using DynamicSunTestApp.Persistence;
+using DynamicSunTestApp.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -19,6 +20,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<WeatherArchiveService>();
 builder.Services.AddScoped<IExcelParserService, ExcelParserService>();
+
+builder.Services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot/browser"; });
 
 builder.Services.AddCors(options =>
 {
@@ -44,8 +47,17 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+app.UseSpaStaticFiles();
+
 app.UseCors(myAllowSpecificOrigins);
 
+app.Map(SpaRouting.App, config => config.UseSpa(spa => spa.Options.SourcePath = "/wwwroot/browser"));
+app.Map(SpaRouting.Archives, config => config.UseSpa(spa => spa.Options.SourcePath = "/wwwroot/browser"));
+app.Map(SpaRouting.Upload, config => config.UseSpa(spa => spa.Options.SourcePath = "/wwwroot/browser"));
+
 app.MapControllers();
+
+await app.MigrateDatabaseAsync();
 
 app.Run();

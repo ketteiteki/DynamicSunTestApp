@@ -1,5 +1,6 @@
 using DynamicSunTestApp.Application.Models;
 using DynamicSunTestApp.Application.Services.Interfaces;
+using DynamicSunTestApp.Domain.Constants;
 using DynamicSunTestApp.Domain.Entities;
 using DynamicSunTestApp.Domain.Responses;
 using DynamicSunTestApp.Persistence;
@@ -38,6 +39,11 @@ public class WeatherArchiveService(
     
     public async Task<Result<List<WeatherArchiveDto>>> UploadWeatherArchiveAsync(IFormFile[] files)
     {
+        if (files.Any(file => file.ContentType != ContentTypeConstants.Xlsx))
+        {
+            return new Result<List<WeatherArchiveDto>>(new Error(ErrorConstants.FilesAreNotExcel));
+        }
+        
         var weatherArchiveDtoList = new List<WeatherArchiveDto>();
         
         try
@@ -61,7 +67,7 @@ public class WeatherArchiveService(
         }
         catch (Exception)
         {
-            return new Result<List<WeatherArchiveDto>>(new Error("The files are invalid"));
+            return new Result<List<WeatherArchiveDto>>(new Error(ErrorConstants.FilesAreInvalid));
         }
 
         await context.SaveChangesAsync();

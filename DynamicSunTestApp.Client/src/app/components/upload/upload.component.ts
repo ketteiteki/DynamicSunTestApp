@@ -16,6 +16,8 @@ import {firstValueFrom} from "rxjs";
   styleUrl: './upload.component.scss'
 })
 export class UploadComponent {
+  //state
+  public showLoader: boolean = false;
 
   constructor(
     private weatherArchiveApiService: WeatherArchiveApiService
@@ -24,8 +26,15 @@ export class UploadComponent {
 
   //events
   public async onFilesDroppedHandler(files: File[]) {
-    const request = new UploadWeatherArchiveRequest(files);
-    const postWeatherArchives$ = this.weatherArchiveApiService.postWeatherArchives(request);
-    await firstValueFrom(postWeatherArchives$);
+    try {
+      const request = new UploadWeatherArchiveRequest(files);
+      const postWeatherArchives$ = this.weatherArchiveApiService.postWeatherArchives(request);
+      this.showLoader = true;
+      await firstValueFrom(postWeatherArchives$);
+      this.showLoader = false;
+    } catch (e: any) {
+      this.showLoader = false;
+      alert(e.error.message);
+    }
   }
 }
